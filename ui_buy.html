@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>매수</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/assets/style.css" />
+</head>
+<body>
+  <main class="container">
+    <a href="/ui_home.html">← 홈</a>
+    <h1>매수</h1>
+    
+  <div class="card">
+    <div class="grid grid-2">
+      <div>
+        <label class="label">마켓</label>
+        <select id="market" class="input">
+          <option value="USDT_KRW">USDT_KRW</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">주문유형</label>
+        <select id="orderType" class="input">
+          <option value="limit">지정가</option>
+          <option value="market">시장가</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">가격 (KRW)</label>
+        <input id="price" class="input" placeholder="예: 1390">
+      </div>
+      <div>
+        <label class="label">수량 (qty)</label>
+        <input id="qty" class="input" placeholder="예: 100">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row"><strong>현재 잔고</strong> <span id="bal" class="badge">조회중…</span></div>
+      <div class="row percent-btns" style="margin-top:8px;">
+        <button class="btn" data-pct="25">25%</button>
+        <button class="btn" data-pct="50">50%</button>
+        <button class="btn" data-pct="75">75%</button>
+        <button class="btn" data-pct="100">100%</button>
+      </div>
+      <small class="muted">잔고 기준 비율로 수량(qty)을 자동 입력합니다.</small>
+    </div>
+
+    <div class="row" style="margin-top:8px;">
+      <button id="submitBtn" class="btn primary 매수하기">매수</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>응답</h3>
+    <pre id="out" class="card mono">{결과 대기}</pre>
+  </div>
+
+  <script type="module">
+    import { $, setJSON, getKeys } from '/js/app.js';
+    async function fetchBalance() {
+      const keys = getKeys();
+      try {
+        const r = await fetch('/api/fake-balance', { method:'POST', headers:{'content-type':'application/json','x-ak': keys.access,'x-sk': keys.secret}, body:'{}' });
+        const j = await r.json();
+        return j.balance || 1000000;
+      } catch { return 1000000; }
+    }
+    async function init() {
+      const out = $('#out');
+      const qty = $('#qty');
+      const balEl = $('#bal');
+      const balance = await fetchBalance();
+      balEl.textContent = balance + ' KRW';
+
+      document.querySelectorAll('[data-pct]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const pct = parseInt(btn.getAttribute('data-pct'),10);
+          const price = parseFloat($('#price').value || 0);
+          if (!price) { out.textContent='가격을 먼저 입력하세요.'; return; }
+          const krwToSpend = balance * (pct/100);
+          const amount = Math.floor((krwToSpend / price) * 1000000) / 1000000;
+          qty.value = String(amount);
+        });
+      });
+
+      $('#submitBtn').addEventListener('click', async ()=>{
+        out.textContent='요청 전송 중… (샘플 엔드포인트)';
+        const keys = getKeys();
+        const payload = {
+          market: $('#market').value,
+          orderType: $('#orderType').value,
+          price: $('#price').value,
+          qty: $('#qty').value,
+          side: 'buy'
+        };
+        try {
+          const r = await fetch('/api/place-order', { method:'POST', headers:{'content-type':'application/json','x-ak': keys.access,'x-sk': keys.secret}, body: JSON.stringify(payload) });
+          const j = await r.json();
+          setJSON(out, j);
+        } catch(e) { out.textContent='오류: '+e; }
+      });
+    }
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  </main>
+</body>
+</html>
