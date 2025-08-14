@@ -1,1 +1,27 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>잔고</title><link rel="stylesheet" href="/assets/style.css"/><script type="module">import{$,setJSON,authHeaders}from"/js/app.js";async function run(){const e=$("#out");e.textContent="잔고 조회 중...";try{const t=await fetch("/api/balance",{method:"POST",headers:authHeaders(),body:"{}"}),n=await t.json();setJSON(e,n)}catch(t){e.textContent="오류: "+t}}window.addEventListener("DOMContentLoaded",run);</script></head><body><main class="container"><a href="/ui_home.html">← 홈</a><h1>잔고</h1><div class="card"><button class="btn" onclick="location.reload()">새로고침</button><pre id="out" class="card">{결과 대기}</pre></div></main></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>잔액 조회</title>
+    <script type="module">
+        import { getBalance } from './api/balance.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('checkBalance').addEventListener('click', async () => {
+                try {
+                    const balance = await getBalance();
+                    document.getElementById('result').textContent = JSON.stringify(balance, null, 2);
+                } catch (e) {
+                    document.getElementById('result').textContent = "오류: " + e.message;
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>코인원 잔액 조회</h1>
+    <button id="checkBalance">잔액 확인</button>
+    <pre id="result"></pre>
+</body>
+</html>
