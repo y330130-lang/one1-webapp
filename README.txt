@@ -1,5 +1,12 @@
-업로드 위치: 리포지토리 루트에 그대로 압축 해제하면 `api/balance.js` 경로로 들어갑니다.
-1) GitHub에서 one1-webapp 저장소 → Add file → Upload files
-2) 이 zip을 풀어서 나온 `api` 폴더(그 안의 balance.js)를 드래그앤드롭
-3) Commit
-4) Vercel에서 Redeploy
+# Patch: coinone balance wiring
+
+이 ZIP 안의 파일들을 **저장소 루트에 그대로 덮어쓰기** 하세요.
+
+필수 구조(소문자 주의):
+- /api/balance.js
+- /assets/app.js
+- /ui_apikey.html
+
+그 다음 깃허브에 커밋 → Vercel 자동 배포 → 아이폰에서
+https://<도메인>/ui_apikey.html?v=patch1 열고 '키 상태 확인(잔고 조회)' 버튼을 누르세요.
+응답이 { ok:true, coinone:{...} } 로 나오면 성공입니다.

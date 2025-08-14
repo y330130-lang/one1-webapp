@@ -4,94 +4,81 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>API 키 입력</title>
-  <style>
-    body{background:#0b1220;color:#e9eefb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px}
-    .card{background:#111b2a;border:1px solid #1f2a3d;border-radius:12px;padding:16px;max-width:680px;margin:0 auto 18px}
-    .label{margin:8px 0 6px;color:#9eb3d6}
-    .input{width:100%;padding:12px 14px;border-radius:10px;background:#0d1726;border:1px solid #21314a;color:#e9eefb}
-    .row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer}
-    .primary{background:#2563eb;color:white}
-    .danger{background:#ef4444;color:white}
-    pre{white-space:pre-wrap;background:#0d1726;border:1px solid #21314a;border-radius:10px;padding:12px}
-    a{color:#8ab4ff}
-  </style>
-</head>
-<body>
-  <h1>API 키 입력 (브라우저 저장)</h1>
-  <div class="card">
-    <div class="label">Access Key</div>
-    <input id="ak" class="input" placeholder="ak..." />
-    <div class="label" style="margin-top:10px">Secret Key</div>
-    <input id="sk" class="input" placeholder="sk..." />
-
-    <div class="row">
-      <button id="save" class="btn primary">저장</button>
-      <button id="wipe" class="btn danger">키 삭제</button>
-      <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
-    </div>
-
-    <p style="color:#ffcf66;margin-top:12px">⚠️ 이 방식은 이 브라우저의 <code>localStorage</code>에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
-    <pre id="out">{결과 대기}</pre>
-  </div>
-
+  <link rel="stylesheet" href="/assets/style.css" />
   <script type="module">
-    // helper
-    const $ = (sel) => document.querySelector(sel);
-    const setJSON = (el, data) => el.textContent = JSON.stringify(data, null, 2);
-
-    function loadKeys(){
-      return {
-        ak: localStorage.getItem("ak") || "",
-        sk: localStorage.getItem("sk") || "",
-      };
-    }
-    function saveKeys(ak, sk){
-      localStorage.setItem("ak", ak);
-      localStorage.setItem("sk", sk);
-    }
-    function clearKeys(){
-      localStorage.removeItem("ak");
-      localStorage.removeItem("sk");
-    }
+    import { $, setJSON, getKeys, saveKeys, clearKeys } from "/assets/app.js";
 
     window.addEventListener("DOMContentLoaded", () => {
-      const out = $("#out");
-      const akI = $("#ak");
-      const skI = $("#sk");
-      const { ak, sk } = loadKeys();
-      akI.value = ak; skI.value = sk;
+      const $ak = $("#ak"), $sk = $("#sk"), out = $("#out");
+
+      // 기존 저장 키 불러오기
+      const cur = getKeys();
+      $ak.value = cur.access || "";
+      $sk.value = cur.secret || "";
 
       $("#save").addEventListener("click", () => {
-        saveKeys(akI.value, skI.value);
+        saveKeys($ak.value, $sk.value);
         out.textContent = "저장 완료 ✅";
       });
       $("#wipe").addEventListener("click", () => {
         clearKeys();
-        akI.value = ""; skI.value = "";
-        out.textContent = "키 삭제 완료 🗑️";
+        $ak.value = "";
+        $sk.value = "";
+        out.textContent = "키 삭제 완료";
       });
 
-      // ✅ 반드시 /api/balance 로 호출
+      // ✅ 잔고 조회 버튼: /api/balance 로 POST
       $("#check").addEventListener("click", async () => {
-        out.textContent = "요청 중…";
         try {
+          const { access, secret } = getKeys();
           const r = await fetch("/api/balance", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-ak": akI.value,
-              "x-sk": skI.value
-            },
-            body: JSON.stringify({ ts: Date.now() })
+            headers: { "x-ak": access || "", "x-sk": secret || "" }
           });
-          const data = await r.json();
-          setJSON(out, data);
+          const j = await r.json();
+          setJSON(out, j);
         } catch (e) {
-          setJSON(out, { ok:false, error:String(e) });
+          out.textContent = "오류: " + e;
         }
       });
     });
   </script>
+  <style>
+    body { background:#0c1220; color:#e6ecff; font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,Apple SD Gothic Neo,Malgun Gothic,sans-serif; }
+    .container { max-width:760px; margin:32px auto; padding:0 16px; }
+    .card { background:#111a2b; border-radius:16px; padding:20px; box-shadow:0 8px 20px rgba(0,0,0,.25); }
+    .label { color:#9fb3ff; margin:12px 0 6px; font-weight:600; }
+    .input { width:100%; padding:12px 14px; border-radius:12px; border:1px solid #223; background:#0e1526; color:#e6ecff; }
+    .btn { padding:10px 14px; border-radius:12px; border:0; cursor:pointer; }
+    .primary { background:#2b66ff; color:white; }
+    .danger { background:#eb5757; color:white; }
+    .mono { white-space:pre-wrap; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .row { display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; }
+    .hint { color:#aab; font-size:14px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <a href="/ui_home.html" style="color:#9fb3ff">← 홈으로</a>
+    <h1>API 키 입력 (브라우저 저장)</h1>
+
+    <div class="card">
+      <div class="label">Access Key</div>
+      <input id="ak" class="input" placeholder="ex) ..." />
+
+      <div class="label" style="margin-top:12px">Secret Key</div>
+      <input id="sk" class="input" placeholder="ex) ..." />
+
+      <div class="row">
+        <button id="save" class="btn primary">저장</button>
+        <button id="wipe" class="btn danger">키 삭제</button>
+        <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
+      </div>
+
+      <p class="hint">⚠️ 이 방식은 이 브라우저의 <span class="mono">localStorage</span> 에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
+
+      <pre id="out" class="card mono">{결과 대기}</pre>
+    </div>
+  </main>
 </body>
 </html>
