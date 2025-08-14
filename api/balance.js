@@ -1,10 +1,9 @@
 export const config = { runtime: "nodejs18.x" };
-// api/balance.js
 import crypto from "crypto";
 
 function cors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, x-ak, x-sk");
 }
 
@@ -28,9 +27,9 @@ export default async function handler(req, res) {
       headers: {
         "Content-Type": "application/json",
         "X-COINONE-PAYLOAD": payloadB64,
-        "X-COINONE-SIGNATURE": sig
+        "X-COINONE-SIGNATURE": sig,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     const data = await r.json();
