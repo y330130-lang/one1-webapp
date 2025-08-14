@@ -1,1 +1,4 @@
-{"rewrites": [{"source": "/api/:match*", "destination": "/api/:match*"}, {"source": "/:path*", "destination": "/ui_home.html"}], "cleanUrls": true}
+{
+  "cleanUrls": true,
+  "trailingSlash": false
+}

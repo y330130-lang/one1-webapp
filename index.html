@@ -1,1 +1,33 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Coinone Mini</title><meta http-equiv="refresh" content="0; url=/ui_home.html"/><link rel="stylesheet" href="/assets/style.css"/></head><body><main class="container"><div class="card"><h1>Coinone Mini</h1><p>자동 이동 중... <a href="/ui_home.html">여기</a>를 눌러 이동</p></div></main></body></html>
+
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Coinone Mini</title>
+  <link rel="stylesheet" href="./assets/style.css"/>
+</head>
+<body>
+  <main class="container">
+    <h1>Coinone Mini</h1>
+    <div class="grid">
+      <a class="card" href="./ui_apikey.html">
+        <div class="label">STEP 1</div>
+        <h3>API 키 입력/확인</h3>
+        <p class="footer">브라우저 localStorage 저장 (개인기기만 사용)</p>
+      </a>
+      <a class="card" href="./ui_balance.html">
+        <div class="label">STEP 2</div>
+        <h3>잔고 조회</h3>
+        <p class="footer">/api/balance 서버리스 함수 사용</p>
+      </a>
+      <a class="card" href="./ui_price.html">
+        <div class="label">STEP 3</div>
+        <h3>시세 조회</h3>
+        <p class="footer">공개 시세 API 프록시</p>
+      </a>
+    </div>
+    <p class="footer">배포 테스트 성공 ✅ (이 화면이 보이면 세팅 완료)</p>
+  </main>
+</body>
+</html>

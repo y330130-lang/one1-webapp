@@ -1,1 +1,13 @@
-export const config={runtime:"nodejs18.x"};export default function handler(req,res){res.setHeader("Access-Control-Allow-Origin","*");res.status(200).json({ok:true,method:req.method,path:req.url,got_ak:!!req.headers["x-ak"],got_sk:!!req.headers["x-sk"]})}
+
+// api/debug.js
+export default async function handler(req, res){
+  const ak = req.headers["x-ak"] ? "present" : "missing";
+  const sk = req.headers["x-sk"] ? "present" : "missing";
+  res.status(200).json({
+    ok: true,
+    seen_headers: { "x-ak": ak, "x-sk": sk },
+    method: req.method,
+    body: req.body || null,
+    hint: "브라우저에서 헤더 부착 상태만 확인하는 디버그 엔드포인트입니다."
+  });
+}

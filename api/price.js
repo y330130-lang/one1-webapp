@@ -1,1 +1,21 @@
-export const config={runtime:"nodejs18.x"};export default async function handler(e,s){s.setHeader("Access-Control-Allow-Origin","*"),s.setHeader("Access-Control-Allow-Methods","GET,OPTIONS"),s.setHeader("Access-Control-Allow-Headers","Content-Type");if("OPTIONS"===e.method)return s.status(200).end();try{const r=new URL(e.url,"http://localhost"),t=(r.searchParams.get("market")||"USDT_KRW").toUpperCase(),[o,a]=t.split("_");if("KRW"!==a)return s.status(400).json({ok:!1,error:"only-krw-supported",market:t});const n=[`https://api.coinone.co.kr/public/v2/ticker_new/KRW?symbols=${o}`,`https://api.coinone.co.kr/public/v2/ticker_new/${o}`,`https://api.coinone.co.kr/ticker?currency=${o.toLowerCase()}`];let c=null,i=null,l=null;for(const r of n){const t=await fetch(r,{headers:{Accept:"application/json"},cache:"no-store"});if(!t.ok)continue;const o=await t.json();if(l=o,o?.tickers&&Array.isArray(o.tickers)){const e=o.tickers[0];c=Number(null!=e&&e.last??e?.close??e?.tradePrice??e?.lastPrice??e?.buy??e?.sell)}else c=Number(o?.last??o?.tradePrice??o?.lastPrice??o?.krwLast??o?.price);if(Number.isFinite(c)&&c>0){i=r;break}}return Number.isFinite(c)&&c>0?s.status(200).json({ok:!0,market:t,price:c,source:i}):s.status(502).json({ok:!1,error:"price-not-found",market:t,raw:l})}catch(e){return s.status(500).json({ok:!1,error:"server-error",message:String(e)})}}
+
+// api/price.js — public ticker proxy
+export default async function handler(req, res){
+  try{
+    const pair = (req.query.pair || "KRW-USDT").toString(); // e.g., KRW-BTC
+    // Coinone public ticker (new): /public/v2/ticker_new/{PAIR}
+    // Fallback to old endpoint if needed.
+    const urlNew = `https://api.coinone.co.kr/public/v2/ticker_new/${encodeURIComponent(pair)}`;
+    let r = await fetch(urlNew);
+    if(!r.ok){
+      // fallback
+      const [cur, coin] = pair.split("-");
+      const urlOld = `https://api.coinone.co.kr/ticker/?currency=${encodeURIComponent(cur.toLowerCase())}&target=${encodeURIComponent(coin.toLowerCase())}`;
+      r = await fetch(urlOld);
+    }
+    const data = await r.json();
+    res.status(200).json({ ok:true, pair, data });
+  }catch(e){
+    res.status(500).json({ ok:false, error:"server-error", message:String(e) });
+  }
+}

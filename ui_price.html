@@ -4,27 +4,36 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>잔고 조회</title>
+  <title>시세 조회</title>
   <link rel="stylesheet" href="./assets/style.css"/>
   <script type="module">
-    import { $, fetchBalance, setJSON } from "./js/app.js";
+    import { $, fetchPrice, setJSON } from "./js/app.js";
     window.addEventListener("DOMContentLoaded", () => {
-      const out = $("#out");
-      $("#load").addEventListener("click", async () => {
+      const sel = $("#pair"), out = $("#out");
+      const run = async () => {
         out.textContent = "조회 중...";
-        try { setJSON(out, await fetchBalance()); }
+        try { setJSON(out, await fetchPrice(sel.value)); }
         catch(e){ out.textContent = "오류: " + e; }
-      });
+      };
+      $("#load").addEventListener("click", run);
+      run();
     });
   </script>
 </head>
 <body>
   <main class="container">
     <a class="badge" href="./index.html">← 홈</a>
-    <h1>잔고 조회</h1>
+    <h1>시세 조회</h1>
     <div class="card">
       <div class="row">
-        <button id="load" class="btn primary">잔고 조회</button>
+        <div class="label">마켓</div>
+        <select id="pair">
+          <option>KRW-USDT</option>
+          <option>KRW-BTC</option>
+          <option>KRW-ETH</option>
+          <option>KRW-XRP</option>
+        </select>
+        <button id="load" class="btn primary">조회</button>
       </div>
       <pre id="out" class="card mono" style="margin-top:12px">{결과 대기}</pre>
     </div>
