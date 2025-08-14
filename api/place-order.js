@@ -1,9 +1,1 @@
-export const config = { runtime: "nodejs18.x"};
-export default async function handler(req, res) {
-  res.status(200).json({
-    ok: true,
-    simulated: true,
-    received: req.body || {},
-    note: "이 엔드포인트는 주문 요청을 에코합니다. 실제 거래 API 연결 전 테스트용입니다."
-  });
-}
+export const config={runtime:"nodejs18.x"};export default async function handler(e,s){s.setHeader("Access-Control-Allow-Origin","*"),s.setHeader("Access-Control-Allow-Methods","GET,POST,OPTIONS"),s.setHeader("Access-Control-Allow-Headers","Content-Type, x-ak, x-sk");if("OPTIONS"===e.method)return s.status(200).end();try{const r=[];for await(const s of e)r.push(s);let t={};try{t=JSON.parse(Buffer.concat(r).toString("utf8")||"{}")}catch(e){}s.status(200).json({ok:!0,received:t,note:"echo only (hook real order later)"})}catch(e){s.status(500).json({ok:!1,error:String(e)})}}

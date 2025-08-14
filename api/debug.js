@@ -1,7 +1,1 @@
-export default function handler(req, res) {
- res.status(200).json({
-  ok: true,
-  path: req.url,
-  headers: req.headers
- });
-}
+export const config={runtime:"nodejs18.x"};export default function handler(req,res){res.setHeader("Access-Control-Allow-Origin","*");res.status(200).json({ok:true,method:req.method,path:req.url,got_ak:!!req.headers["x-ak"],got_sk:!!req.headers["x-sk"]})}
