@@ -1,89 +1,96 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>API 키 입력 (브라우저 저장)</title>
-  <link rel="stylesheet" href="/assets/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API 키 입력</title>
   <style>
-    body { padding: 16px; }
-    .row { margin-top: 12px; }
-    .btn { padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; }
-    .primary { background: #4e8cff; color: #fff; }
-    .danger { background: #ff5a5a; color: #fff; }
-    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px; }
-    .mono { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; }
-    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: #eee; }
-    label { display:block; color:#9ab; margin: 8px 0 6px; }
+    body{background:#0b1220;color:#e9eefb;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px}
+    .card{background:#111b2a;border:1px solid #1f2a3d;border-radius:12px;padding:16px;max-width:680px;margin:0 auto 18px}
+    .label{margin:8px 0 6px;color:#9eb3d6}
+    .input{width:100%;padding:12px 14px;border-radius:10px;background:#0d1726;border:1px solid #21314a;color:#e9eefb}
+    .row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+    .btn{padding:10px 14px;border-radius:12px;border:0;cursor:pointer}
+    .primary{background:#2563eb;color:white}
+    .danger{background:#ef4444;color:white}
+    pre{white-space:pre-wrap;background:#0d1726;border:1px solid #21314a;border-radius:10px;padding:12px}
+    a{color:#8ab4ff}
   </style>
 </head>
 <body>
-  <main class="container">
-    <a href="/ui_home.html">← 홈으로</a>
-    <h1>API 키 입력 (브라우저 저장)</h1>
+  <h1>API 키 입력 (브라우저 저장)</h1>
+  <div class="card">
+    <div class="label">Access Key</div>
+    <input id="ak" class="input" placeholder="ak..." />
+    <div class="label" style="margin-top:10px">Secret Key</div>
+    <input id="sk" class="input" placeholder="sk..." />
 
-    <div class="card">
-      <label>Access Key</label>
-      <input id="ak" placeholder="ak..." autocomplete="off"/>
-      <label class="row">Secret Key</label>
-      <input id="sk" placeholder="sk..." autocomplete="off"/>
-
-      <div class="row">
-        <button id="save" class="btn primary">저장</button>
-        <button id="wipe" class="btn danger">키 삭제</button>
-        <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
-      </div>
-
-      <p class="row" style="color:#9aa7bd;">
-        ⚠️ 이 방식은 이 브라우저의 <span class="kbd">localStorage</span>에 저장됩니다. 공용 기기에서는 사용하지 마세요.
-      </p>
-
-      <pre id="out" class="card mono">{ 결과 대기 }</pre>
+    <div class="row">
+      <button id="save" class="btn primary">저장</button>
+      <button id="wipe" class="btn danger">키 삭제</button>
+      <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
     </div>
-  </main>
+
+    <p style="color:#ffcf66;margin-top:12px">⚠️ 이 방식은 이 브라우저의 <code>localStorage</code>에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
+    <pre id="out">{결과 대기}</pre>
+  </div>
 
   <script type="module">
+    // helper
     const $ = (sel) => document.querySelector(sel);
-    const out = $('#out');
-    const getKeys = () => {
-      try { return JSON.parse(localStorage.getItem('cn_keys') || '{}'); }
-      catch { return {}; }
-    };
-    const setKeys = (obj) => localStorage.setItem('cn_keys', JSON.stringify(obj));
-    const clearKeys = () => localStorage.removeItem('cn_keys');
-    const setJSON = (node, obj) => node.textContent = JSON.stringify(obj, null, 2);
+    const setJSON = (el, data) => el.textContent = JSON.stringify(data, null, 2);
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const cur = getKeys();
-      $('#ak').value = cur.access || '';
-      $('#sk').value = cur.secret || '';
-    });
+    function loadKeys(){
+      return {
+        ak: localStorage.getItem("ak") || "",
+        sk: localStorage.getItem("sk") || "",
+      };
+    }
+    function saveKeys(ak, sk){
+      localStorage.setItem("ak", ak);
+      localStorage.setItem("sk", sk);
+    }
+    function clearKeys(){
+      localStorage.removeItem("ak");
+      localStorage.removeItem("sk");
+    }
 
-    $('#save').addEventListener('click', () => {
-      setKeys({ access: $('#ak').value.trim(), secret: $('#sk').value.trim() });
-      out.textContent = '저장 완료 ✅';
-    });
+    window.addEventListener("DOMContentLoaded", () => {
+      const out = $("#out");
+      const akI = $("#ak");
+      const skI = $("#sk");
+      const { ak, sk } = loadKeys();
+      akI.value = ak; skI.value = sk;
 
-    $('#wipe').addEventListener('click', () => {
-      clearKeys(); $('#ak').value = ''; $('#sk').value = ''; out.textContent = '키 삭제 완료 🗑️';
-    });
+      $("#save").addEventListener("click", () => {
+        saveKeys(akI.value, skI.value);
+        out.textContent = "저장 완료 ✅";
+      });
+      $("#wipe").addEventListener("click", () => {
+        clearKeys();
+        akI.value = ""; skI.value = "";
+        out.textContent = "키 삭제 완료 🗑️";
+      });
 
-    $('#check').addEventListener('click', async () => {
-      const cur = getKeys();
-      const ak = cur.access, sk = cur.secret;
-      if (!ak || !sk) { out.textContent = '키가 비어 있습니다. 먼저 저장하세요.'; return; }
-
-      try {
-        const r = await fetch('/api/balance', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-ak': ak, 'x-sk': sk },
-          body: JSON.stringify({ ts: Date.now() })
-        });
-        const j = await r.json();
-        setJSON(out, j);
-      } catch (e) {
-        setJSON(out, { ok:false, error:String(e) });
-      }
+      // ✅ 반드시 /api/balance 로 호출
+      $("#check").addEventListener("click", async () => {
+        out.textContent = "요청 중…";
+        try {
+          const r = await fetch("/api/balance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-ak": akI.value,
+              "x-sk": skI.value
+            },
+            body: JSON.stringify({ ts: Date.now() })
+          });
+          const data = await r.json();
+          setJSON(out, data);
+        } catch (e) {
+          setJSON(out, { ok:false, error:String(e) });
+        }
+      });
     });
   </script>
 </body>

@@ -1,3 +1,4 @@
+// api/balance.js
 export const config = { runtime: "nodejs18.x" };
 import crypto from "crypto";
 
@@ -32,7 +33,7 @@ export default async function handler(req, res) {
       body: JSON.stringify(payload),
     });
 
-    const data = await r.json();
+    const data = await r.json().catch(() => ({}));
     return res.status(200).json({ ok: true, coinone: data });
   } catch (e) {
     return res.status(500).json({ ok: false, error: "server-error", message: String(e) });
