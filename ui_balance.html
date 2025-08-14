@@ -1,33 +1,19 @@
 
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>잔고 조회</title>
-  <link rel="stylesheet" href="./assets/style.css"/>
-  <script type="module">
-    import { $, fetchBalance, setJSON } from "./js/app.js";
-    window.addEventListener("DOMContentLoaded", () => {
-      const out = $("#out");
-      $("#load").addEventListener("click", async () => {
-        out.textContent = "조회 중...";
-        try { setJSON(out, await fetchBalance()); }
-        catch(e){ out.textContent = "오류: " + e; }
-      });
-    });
-  </script>
-</head>
-<body>
-  <main class="container">
-    <a class="badge" href="./index.html">← 홈</a>
-    <h1>잔고 조회</h1>
-    <div class="card">
-      <div class="row">
-        <button id="load" class="btn primary">잔고 조회</button>
-      </div>
-      <pre id="out" class="card mono" style="margin-top:12px">{결과 대기}</pre>
-    </div>
-  </main>
-</body>
-</html>
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>잔고 조회</title>
+<link rel="stylesheet" href="/assets/style.css"/>
+<script type="module">
+import { $, postWithKeys, setJSON } from '/js/app.js'
+window.addEventListener('DOMContentLoaded', () => {
+  const out = $('#out'); out.textContent='잔고 조회 시도 중...'
+  postWithKeys('/api/balance',{}).then(j=> setJSON(out,j)).catch(e=> out.textContent='오류: '+e)
+})
+</script>
+</head><body>
+<main class="container">
+  <a href="/ui_home.html" class="small">← 홈</a>
+  <h1>잔고</h1>
+  <div class="card"><pre id="out" class="mono">{결과 대기}</pre></div>
+</main>
+</body></html>

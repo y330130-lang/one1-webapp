@@ -1,52 +1,37 @@
 
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>API 키 입력</title>
-  <link rel="stylesheet" href="./assets/style.css"/>
-  <script type="module">
-    import { $, saveKeys, getKeys, clearKeys, echoHeaders, setJSON } from "./js/app.js";
-    window.addEventListener("DOMContentLoaded", () => {
-      const ak = $("#ak"), sk = $("#sk"), out = $("#out");
-      const cur = getKeys(); ak.value = cur.access||""; sk.value = cur.secret||"";
-
-      $("#save").addEventListener("click", () => {
-        saveKeys(ak.value.trim(), sk.value.trim());
-        out.textContent = "저장 완료 ✅";
-      });
-      $("#wipe").addEventListener("click", () => {
-        clearKeys(); ak.value = sk.value = "";
-        out.textContent = "키 삭제 ✅";
-      });
-      $("#check").addEventListener("click", async () => {
-        try { setJSON(out, await echoHeaders()); }
-        catch(e){ out.textContent = "오류: " + e; }
-      });
-    });
-  </script>
-</head>
-<body>
-  <main class="container">
-    <a class="badge" href="./index.html">← 홈</a>
-    <h1>API 키 입력 (브라우저 저장)</h1>
-    <div class="card">
-      <div class="label">Access Key</div>
-      <input id="ak" class="input" placeholder="..."/>
-      <div class="label" style="margin-top:12px">Secret Key</div>
-      <input id="sk" class="input" placeholder="..."/>
-
-      <div class="row" style="margin-top:14px">
-        <button id="save" class="btn primary">저장</button>
-        <button id="wipe" class="btn danger">키 삭제</button>
-        <button id="check" class="btn ghost">키 상태 확인(잔고 조회)</button>
-      </div>
-
-      <p class="label" style="margin-top:12px">⚠️ 이 방식은 이 브라우저의 <span class="mono">localStorage</span> 에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
-
-      <pre id="out" class="card mono" style="margin-top:12px">{결과 대기}</pre>
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>API 키 입력</title>
+<link rel="stylesheet" href="/assets/style.css"/>
+<script type="module">
+import { $, saveKeys, clearKeys, getKeys, setJSON, echoHeaders } from '/js/app.js'
+window.addEventListener('DOMContentLoaded', () => {
+  const ak = $('#ak'), sk = $('#sk'), out = $('#out')
+  const cur = getKeys(); ak.value = cur.access; sk.value = cur.secret;
+  $('#save').addEventListener('click', () => { saveKeys(ak.value, sk.value); out.textContent='저장 완료 ✅' })
+  $('#wipe').addEventListener('click', () => { clearKeys(); ak.value=''; sk.value=''; out.textContent='키 삭제 완료' })
+  $('#check').addEventListener('click', async () => {
+     try{ const j = await echoHeaders(); setJSON(out, j) }
+     catch(e){ out.textContent='오류: '+e }
+  })
+})
+</script>
+</head><body>
+<main class="container">
+  <a href="/ui_home.html" class="small">← 홈</a>
+  <h1>API 키 입력 (브라우저 저장)</h1>
+  <div class="card">
+    <div class="label">Access Key</div>
+    <input id="ak" class="input" placeholder="ak..." />
+    <div class="label" style="margin-top:12px">Secret Key</div>
+    <input id="sk" class="input" placeholder="sk..." />
+    <div style="margin-top:14px">
+      <button id="save" class="btn primary">저장</button>
+      <button id="wipe" class="btn danger">키 삭제</button>
+      <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
     </div>
-  </main>
-</body>
-</html>
+    <p class="small" style="margin-top:10px">⚠️ 이 방식은 이 브라우저의 <span class="badge">localStorage</span>에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
+    <pre id="out" class="mono"></pre>
+  </div>
+</main>
+</body></html>

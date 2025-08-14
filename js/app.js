@@ -1,45 +1,39 @@
 
-// js/app.js  — tiny helper library
-export const $ = (sel) => document.querySelector(sel);
-export const setJSON = (el, obj) => el.textContent = JSON.stringify(obj, null, 2);
+// js/app.js - tiny helper lib
+export function $(sel){return document.querySelector(sel)}
+export function setJSON(el, obj){ el.textContent = JSON.stringify(obj,null,2) }
 
-// localStorage helpers
-const LS_KEY = "coinone-mini-keys";
-export function saveKeys(access, secret){
-  localStorage.setItem(LS_KEY, JSON.stringify({access, secret}));
+const K = {AK:'x-ak', SK:'x-sk', LS:'coinone-mini-keys'}
+export function saveKeys(ak, sk){
+  localStorage.setItem(K.LS, JSON.stringify({access:ak||'', secret:sk||''}))
+  return getKeys()
+}
+export function clearKeys(){
+  localStorage.removeItem(K.LS)
 }
 export function getKeys(){
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); }
-  catch(e){ return {}; }
+  try{ const v = JSON.parse(localStorage.getItem(K.LS)||'{}'); return {access:v.access||'', secret:v.secret||''} }
+  catch { return {access:'',secret:''} }
 }
-export function clearKeys(){ localStorage.removeItem(LS_KEY); }
 
-// simple echo to check headers are sent
 export async function echoHeaders(){
-  const {access, secret} = getKeys();
-  const body = { ts: Date.now() };
-  const r = await fetch("/api/debug", {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "x-ak": access||"", "x-sk": secret||"" },
-    body: JSON.stringify(body)
-  });
-  return r.json();
-}
-
-// private: balance
-export async function fetchBalance(){
-  const {access, secret} = getKeys();
-  const r = await fetch("/api/balance", {
-    method: "POST",
-    headers: { "Content-Type":"application/json", "x-ak": access||"", "x-sk": secret||"" },
+  const k = getKeys()
+  const r = await fetch('/api/debug', {
+    method:'POST',
+    headers: { [K.AK]: k.access, [K.SK]: k.secret, 'Content-Type':'application/json' },
     body: JSON.stringify({ ts: Date.now() })
-  });
-  return r.json();
+  })
+  if(!r.ok) throw new Error('debug-failed '+r.status)
+  return await r.json()
 }
 
-// public: price (KRW-XXX), e.g. KRW-USDT, KRW-BTC, KRW-ETH
-export async function fetchPrice(pair="KRW-USDT"){
-  const url = `/api/price?pair=${encodeURIComponent(pair)}`;
-  const r = await fetch(url);
-  return r.json();
+export async function postWithKeys(path, body={}){
+  const k = getKeys()
+  const r = await fetch(path, {
+    method: 'POST',
+    headers: { [K.AK]: k.access, [K.SK]: k.secret, 'Content-Type':'application/json' },
+    body: JSON.stringify(body||{})
+  })
+  if(!r.ok) throw new Error('request-failed '+r.status)
+  return await r.json()
 }

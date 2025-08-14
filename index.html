@@ -1,33 +1,15 @@
 
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Coinone Mini</title>
-  <link rel="stylesheet" href="./assets/style.css"/>
-</head>
-<body>
-  <main class="container">
-    <h1>Coinone Mini</h1>
-    <div class="grid">
-      <a class="card" href="./ui_apikey.html">
-        <div class="label">STEP 1</div>
-        <h3>API 키 입력/확인</h3>
-        <p class="footer">브라우저 localStorage 저장 (개인기기만 사용)</p>
-      </a>
-      <a class="card" href="./ui_balance.html">
-        <div class="label">STEP 2</div>
-        <h3>잔고 조회</h3>
-        <p class="footer">/api/balance 서버리스 함수 사용</p>
-      </a>
-      <a class="card" href="./ui_price.html">
-        <div class="label">STEP 3</div>
-        <h3>시세 조회</h3>
-        <p class="footer">공개 시세 API 프록시</p>
-      </a>
-    </div>
-    <p class="footer">배포 테스트 성공 ✅ (이 화면이 보이면 세팅 완료)</p>
-  </main>
-</body>
-</html>
+<!doctype html><html lang="ko"><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Coinone Mini</title>
+<link rel="stylesheet" href="/assets/style.css"/></head><body>
+<main class="container">
+  <h1>Coinone Mini <span class="badge">v2.6</span></h1>
+  <p class="small">배포 테스트 성공 ✅ (이 화면이 보이면 세팅 완료)</p>
+  <div class="grid">
+    <a class="card" href="/ui_home.html"><h3>메인</h3><div class="small">메뉴 바로가기</div></a>
+    <a class="card" href="/ui_apikey.html"><h3>API 설정</h3><div class="small">키 저장 / 상태 확인</div></a>
+  </div>
+  <footer>브라우저 저장소(localStorage) 사용 — 공용 기기에서는 사용 금지</footer>
+</main>
+</body></html>
