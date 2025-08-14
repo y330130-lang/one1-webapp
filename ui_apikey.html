@@ -1,37 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>API 키 입력</title>
+  <link rel="stylesheet" href="/assets/style.css" />
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <main class="container">
+    <a href="/index.html">← 홈</a>
+    <h1>API 키 입력 (브라우저 저장)</h1>
 
-<!doctype html><html lang="ko"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>API 키 입력</title>
-<link rel="stylesheet" href="/assets/style.css"/>
-<script type="module">
-import { $, saveKeys, clearKeys, getKeys, setJSON, echoHeaders } from '/js/app.js'
-window.addEventListener('DOMContentLoaded', () => {
-  const ak = $('#ak'), sk = $('#sk'), out = $('#out')
-  const cur = getKeys(); ak.value = cur.access; sk.value = cur.secret;
-  $('#save').addEventListener('click', () => { saveKeys(ak.value, sk.value); out.textContent='저장 완료 ✅' })
-  $('#wipe').addEventListener('click', () => { clearKeys(); ak.value=''; sk.value=''; out.textContent='키 삭제 완료' })
-  $('#check').addEventListener('click', async () => {
-     try{ const j = await echoHeaders(); setJSON(out, j) }
-     catch(e){ out.textContent='오류: '+e }
-  })
-})
-</script>
-</head><body>
-<main class="container">
-  <a href="/ui_home.html" class="small">← 홈</a>
-  <h1>API 키 입력 (브라우저 저장)</h1>
-  <div class="card">
-    <div class="label">Access Key</div>
-    <input id="ak" class="input" placeholder="ak..." />
-    <div class="label" style="margin-top:12px">Secret Key</div>
-    <input id="sk" class="input" placeholder="sk..." />
-    <div style="margin-top:14px">
-      <button id="save" class="btn primary">저장</button>
-      <button id="wipe" class="btn danger">키 삭제</button>
-      <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
+    <div class="card">
+      <div class="label">Access Key</div>
+      <input id="ak" class="input" placeholder="예: 1111-2222-..." />
+      <div class="label" style="margin-top:12px">Secret Key</div>
+      <input id="sk" class="input" placeholder="예: abcdef..." />
+
+      <div style="display:flex; gap:12px; margin-top:16px">
+        <button id="save" class="btn primary">저장</button>
+        <button id="wipe" class="btn danger">키 삭제</button>
+        <button id="check" class="btn">키 상태 확인(잔고 조회)</button>
+      </div>
+
+      <p style="color:#9aa4c7; margin-top:8px;">⚠️ 이 방식은 이 브라우저의 <span class="kbd">localStorage</span>에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
+
+      <pre id="out" class="card mono">{결과 대기}</pre>
     </div>
-    <p class="small" style="margin-top:10px">⚠️ 이 방식은 이 브라우저의 <span class="badge">localStorage</span>에 저장됩니다. 공용 기기에서는 사용하지 마세요.</p>
-    <pre id="out" class="mono"></pre>
-  </div>
-</main>
-</body></html>
+  </main>
+
+  <script type="module">
+    import { $, setJSON, getJSON, getKeys, saveKeys, clearKeys, postJSON } from '/js/app.js';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const ak = $('#ak'); const sk = $('#sk'); const out = $('#out');
+      const cur = getKeys(); ak.value = cur.access || ''; sk.value = cur.secret || '';
+
+      $('#save').addEventListener('click', () => {
+        saveKeys(ak.value, sk.value);
+        out.textContent = '저장 완료 ✅';
+      });
+
+      $('#wipe').addEventListener('click', () => {
+        clearKeys(); ak.value = ''; sk.value = '';
+        out.textContent = '키 삭제 완료';
+      });
+
+      $('#check').addEventListener('click', async () => {
+        try {
+          const j = await postJSON('/api/balance', {});
+          setJSON(out, j);
+        } catch (e) {
+          out.textContent = '오류: ' + e;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
